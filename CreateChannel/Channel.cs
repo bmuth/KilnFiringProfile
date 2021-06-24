@@ -24,7 +24,7 @@ namespace CreateChannel
     {
         public DateTime created_at { get; set; }
         public int entry_id { get; set; }
-        public float field1 { get; set; }
+        public double field1 { get; set; }
         public long field2 { get; set; }
     }
 
