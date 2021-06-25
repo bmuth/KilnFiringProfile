@@ -47,11 +47,24 @@ namespace KilnFiringProfile
             DateTime dtStart = dtpFiringDate.Value.Date;
             string Start = dtStart.ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
 
-            string http = string.Format ("https://api.thingspeak.com/channels/{0}/feeds.json?api_key={1}&results=500&start={2}", ChannelID, ReadKey, Start);
+            string http = string.Format ("https://api.thingspeak.com/channels/{0}/feeds.json?api_key={1}&results=1000", ChannelID, ReadKey);
+            var content = await client.GetStringAsync (http);
+            Root KilnDataRoot = JsonConvert.DeserializeObject<Root> (content);
+            int CountReturned = KilnDataRoot.feeds.Count;
 
-            //var content = await client.GetStringAsync (http);
+            List<Feed> KilnData = KilnDataRoot.feeds;
 
-            //Root KilnData = JsonConvert.DeserializeObject<Root> (content);
+            while (CountReturned >= 1000)
+            {
+                http = string.Format ("https://api.thingspeak.com/channels/{0}/feeds.json?api_key={1}&results=1000&end={2}", ChannelID, ReadKey, KilnData[0].created_at);
+                content = await client.GetStringAsync (http);
+                KilnDataRoot = JsonConvert.DeserializeObject<Root> (content);
+                CountReturned = KilnDataRoot.feeds.Count;
+                KilnDataRoot.feeds.AddRange (KilnData);
+                KilnData = KilnDataRoot.feeds;
+            }
+
+            var v = KilnData.Distinct ().ToList ();
 
             TempChart.Series["Temperature"].ChartType = SeriesChartType.Line;
             //var points = (from f in KilnData.feeds select new { temp = f.field1, hours = f.field2 / 3600.0 });

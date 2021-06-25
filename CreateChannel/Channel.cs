@@ -26,6 +26,15 @@ namespace CreateChannel
         public int entry_id { get; set; }
         public double field1 { get; set; }
         public long field2 { get; set; }
+        public override bool Equals (object obj)
+        {
+            return this.entry_id == ((Feed) obj).entry_id && this.entry_id == ((Feed) obj).entry_id;
+        }
+        public override int GetHashCode ()
+        {
+            //Get the ID hash code value
+            return this.entry_id.GetHashCode ();
+        }
     }
 
     public class Root
