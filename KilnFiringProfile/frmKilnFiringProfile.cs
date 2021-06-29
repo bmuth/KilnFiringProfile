@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Text;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace KilnFiringProfile
     {
         string ChannelID = "1410216";
         string ReadKey = "ITCEDQN7BSWMSTID";
+        string UserID = "7ZOLSL6SNVAUZLMB";
 
        public frmKilnFiringProfile ()
         {   
@@ -44,9 +46,7 @@ namespace KilnFiringProfile
         private async void btnFetch_Click (object sender, EventArgs e)
         {
 
-            DateTime dtStart = dtpFiringDate.Value.Date;
-            string Start = dtStart.ToString ("yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'");
-
+ 
             string http = string.Format ("https://api.thingspeak.com/channels/{0}/feeds.json?api_key={1}&results=1000", ChannelID, ReadKey);
             var content = await client.GetStringAsync (http);
             Root KilnDataRoot = JsonConvert.DeserializeObject<Root> (content);
@@ -64,24 +64,36 @@ namespace KilnFiringProfile
                 KilnData = KilnDataRoot.feeds;
             }
 
-            var v = KilnData.Distinct ().ToList ();
+            KilnData = KilnData.Distinct ().ToList ();
+            KilnData.RemoveRange (0, 180);
+            KilnData.RemoveAt (KilnData.Count - 1);
+
+            //tbTitle.Text = "Firing " + KilnData[0].created_at.ToLongDateString ();
+            //TempChart.Titles.Add (tbTitle.Text);
 
             TempChart.Series["Temperature"].ChartType = SeriesChartType.Line;
-            //var points = (from f in KilnData.feeds select new { temp = f.field1, hours = f.field2 / 3600.0 });
 
-            List<T> p = new List<T> ();
-            p.Add (new T (25, 15));
-            p.Add (new T (27, 22));
-            p.Add (new T (33, 27));
-
-            foreach (var t in p)
+            foreach (var k in KilnData)
             {
-                TempChart.Series["Temperature"].Points.AddXY (t.temp, t.hours);
+                TempChart.Series["Temperature"].Points.AddXY (k.field2 / 3600.0, k.field1 * 9.0 / 5.0 + 32.0);
             }
 
-            TempChart.ChartAreas[0].AxisY.Title = "Temperature (Celsius)";
+            TempChart.ChartAreas[0].AxisY.Title = "Temperature (Farenheit)";
             TempChart.ChartAreas[0].AxisX.Title = "Hours";
-            // TempChart.Series["Temperature"].Points.DataBind (points, "temp", "hours", null);
+        }
+
+        /**********************************************
+         * 
+         * Load () - get list of channels
+         * 
+         * *******************************************/
+
+        private async void frmKilnFiringProfile_Load (object sender, EventArgs e)
+        {
+            string http = string.Format ("https://api.thingspeak.com/users/brianmuth/channels.json?api_key={0}", UserID);
+            var content = await client.GetStringAsync (http);
+            RootChannel Channels = JsonConvert.DeserializeObject<RootChannel> (content);
+
         }
     }
 }
