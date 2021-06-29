@@ -28,29 +28,30 @@
         /// </summary>
         private void InitializeComponent ()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.TempChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnPrint = new System.Windows.Forms.Button();
             this.dgvChannel = new System.Windows.Forms.DataGridView();
+            this.btnSaveAs = new System.Windows.Forms.Button();
             this.Channel_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChannelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CreationDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.btnSaveAs = new System.Windows.Forms.Button();
+            this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)(this.TempChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvChannel)).BeginInit();
             this.SuspendLayout();
             // 
             // TempChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.TempChart.ChartAreas.Add(chartArea1);
+            chartArea5.Name = "ChartArea1";
+            this.TempChart.ChartAreas.Add(chartArea5);
             this.TempChart.Location = new System.Drawing.Point(74, 151);
             this.TempChart.Margin = new System.Windows.Forms.Padding(2);
             this.TempChart.Name = "TempChart";
-            series1.ChartArea = "ChartArea1";
-            series1.Name = "Temperature";
-            this.TempChart.Series.Add(series1);
+            series5.ChartArea = "ChartArea1";
+            series5.Name = "Temperature";
+            this.TempChart.Series.Add(series5);
             this.TempChart.Size = new System.Drawing.Size(914, 455);
             this.TempChart.TabIndex = 0;
             this.TempChart.Text = "chart1";
@@ -73,36 +74,18 @@
             this.dgvChannel.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Channel_ID,
             this.ChannelName,
-            this.CreationDate});
-            this.dgvChannel.Location = new System.Drawing.Point(308, 21);
+            this.CreationDate,
+            this.Description});
+            this.dgvChannel.Location = new System.Drawing.Point(130, 23);
             this.dgvChannel.Name = "dgvChannel";
-            this.dgvChannel.ReadOnly = true;
+            this.dgvChannel.RowHeadersWidth = 62;
             this.dgvChannel.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvChannel.Size = new System.Drawing.Size(435, 112);
+            this.dgvChannel.Size = new System.Drawing.Size(761, 112);
             this.dgvChannel.TabIndex = 4;
             this.dgvChannel.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChannel_CellDoubleClick);
+            this.dgvChannel.CellLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChannel_CellLeave);
+            this.dgvChannel.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChannel_CellValueChanged);
             this.dgvChannel.ColumnWidthChanged += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgvChannel_ColumnWidthChanged);
-            // 
-            // Channel_ID
-            // 
-            this.Channel_ID.DataPropertyName = "id";
-            this.Channel_ID.HeaderText = "Channel ID";
-            this.Channel_ID.Name = "Channel_ID";
-            this.Channel_ID.ReadOnly = true;
-            // 
-            // ChannelName
-            // 
-            this.ChannelName.DataPropertyName = "name";
-            this.ChannelName.HeaderText = "Name";
-            this.ChannelName.Name = "ChannelName";
-            this.ChannelName.ReadOnly = true;
-            // 
-            // CreationDate
-            // 
-            this.CreationDate.DataPropertyName = "created_at";
-            this.CreationDate.HeaderText = "Created";
-            this.CreationDate.Name = "CreationDate";
-            this.CreationDate.ReadOnly = true;
             // 
             // btnSaveAs
             // 
@@ -113,6 +96,41 @@
             this.btnSaveAs.Text = "Save As...";
             this.btnSaveAs.UseVisualStyleBackColor = true;
             this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
+            // 
+            // Channel_ID
+            // 
+            this.Channel_ID.DataPropertyName = "id";
+            this.Channel_ID.HeaderText = "Channel ID";
+            this.Channel_ID.MinimumWidth = 8;
+            this.Channel_ID.Name = "Channel_ID";
+            this.Channel_ID.ReadOnly = true;
+            this.Channel_ID.Width = 150;
+            // 
+            // ChannelName
+            // 
+            this.ChannelName.DataPropertyName = "name";
+            this.ChannelName.HeaderText = "Name";
+            this.ChannelName.MinimumWidth = 8;
+            this.ChannelName.Name = "ChannelName";
+            this.ChannelName.ReadOnly = true;
+            this.ChannelName.Width = 150;
+            // 
+            // CreationDate
+            // 
+            this.CreationDate.DataPropertyName = "created_at";
+            this.CreationDate.HeaderText = "Created";
+            this.CreationDate.MinimumWidth = 8;
+            this.CreationDate.Name = "CreationDate";
+            this.CreationDate.ReadOnly = true;
+            this.CreationDate.Width = 150;
+            // 
+            // Description
+            // 
+            this.Description.DataPropertyName = "description";
+            this.Description.HeaderText = "Description";
+            this.Description.MinimumWidth = 8;
+            this.Description.Name = "Description";
+            this.Description.Width = 150;
             // 
             // frmKilnFiringProfile
             // 
@@ -140,10 +158,11 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart TempChart;
         private System.Windows.Forms.Button btnPrint;
         private System.Windows.Forms.DataGridView dgvChannel;
+        private System.Windows.Forms.Button btnSaveAs;
         private System.Windows.Forms.DataGridViewTextBoxColumn Channel_ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChannelName;
         private System.Windows.Forms.DataGridViewTextBoxColumn CreationDate;
-        private System.Windows.Forms.Button btnSaveAs;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Description;
     }
 }
 

@@ -26,8 +26,9 @@ namespace KilnFiringProfile
         private string UserID = "7ZOLSL6SNVAUZLMB";
         private System.Collections.Specialized.StringCollection ChannelColumnWidths;
         private bool bSettingWidthsToBeSaved = false;
-        RootChannel Channels;
-        Root KilnDataRoot;
+        private RootChannel Channels;
+        private Root KilnDataRoot;
+        private bool bDescriptionChanged = false;
 
         public frmKilnFiringProfile ()
         {   
@@ -115,11 +116,18 @@ namespace KilnFiringProfile
 
         private async void frmKilnFiringProfile_Load (object sender, EventArgs e)
         {
-            string http = string.Format ("https://api.thingspeak.com/users/brianmuth/channels.json?api_key={0}", UserID);
-            var content = await client.GetStringAsync (http);
-            Channels = JsonConvert.DeserializeObject<RootChannel> (content);
-            dgvChannel.AutoGenerateColumns = false;
-            dgvChannel.DataSource = Channels.channels;
+            try
+            {
+                string http = string.Format ("https://api.thingspeak.com/users/brianmuth/channels.json?api_key={0}", UserID);
+                var content = await client.GetStringAsync (http);
+                Channels = JsonConvert.DeserializeObject<RootChannel> (content);
+                dgvChannel.AutoGenerateColumns = false;
+                dgvChannel.DataSource = Channels.channels;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show (string.Format ("Failed to reach ThingSpeak.com. {0}", ex.Message));
+            }
 
         }
 
@@ -172,19 +180,23 @@ namespace KilnFiringProfile
 
         private void dgvChannel_CellDoubleClick (object sender, DataGridViewCellEventArgs e)
         {
-            /* find the read key for this channel
-             * ---------------------------------- */
-
-            string ReadKey = string.Empty;
-
-            foreach (var key in Channels.channels[e.RowIndex].api_keys)
+            if (e.ColumnIndex != 3)
             {
-                if (key.write_flag == false)
+                /* find the read key for this channel
+                 * ---------------------------------- */
+
+                string ReadKey = string.Empty;
+
+                foreach (var key in Channels.channels[e.RowIndex].api_keys)
                 {
-                    ReadKey = key.api_key;
+                    if (key.write_flag == false)
+                    {
+                        ReadKey = key.api_key;
+                    }
                 }
+                Fetch (Channels.channels[e.RowIndex].id.ToString (), ReadKey);
+                return;
             }
-            Fetch (Channels.channels[e.RowIndex].id.ToString (), ReadKey);
         }
 
         /*********************************************************
@@ -233,6 +245,62 @@ namespace KilnFiringProfile
                             xs.Serialize (sw, KilnDataRoot);
                         }
                         break;
+                }
+            }
+        }
+
+        private void dgvChannel_CellValueChanged (object sender, DataGridViewCellEventArgs e)
+        {
+            bDescriptionChanged = true;
+        }
+
+        private async void dgvChannel_CellLeave (object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex == 3 && bDescriptionChanged)
+            {
+                /* find the write key for this channel
+                 * ---------------------------------- */
+
+                string WriteKey = string.Empty;
+
+                foreach (var key in Channels.channels[e.RowIndex].api_keys)
+                {
+                    if (key.write_flag)
+                    {
+                        WriteKey = key.api_key;
+                    }
+                }
+
+                public static async Task<TResult> PostFormUrlEncoded<TResult> (string url, IEnumerable<KeyValuePair<string, string>> postData)
+                {
+                    using (var httpClient = new HttpClient ())
+                    {
+                        using (var content = new FormUrlEncodedContent (postData))
+                        {
+                            content.Headers.Clear ();
+                            content.Headers.Add ("Content-Type", "application/x-www-form-urlencoded");
+
+                            HttpResponseMessage response = await httpClient.PostAsync (url, content);
+
+                            return await response.Content.ReadAsAsync<TResult> ();
+                        }
+                    }
+                }
+                try
+                {
+                    var stringPayload = JsonConvert.SerializeObject (Channels.channels[e.RowIndex]);
+                    var httpContent = new StringContent (stringPayload, Encoding.UTF8, "application/json");
+                    HttpClient http = new HttpClient ();
+
+                    var httpResponse = await http.PutAsync (string.Format ("https://api.thingspeak.com/channels/{0}.json?api_key={1}", Channels.channels[e.RowIndex].id, WriteKey), httpContent);
+                    if (httpResponse != null)
+                    {
+                        MessageBox.Show (httpResponse.Content.ToString ());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show (string.Format ("Failed to reach ThingSpeak.com. {0}", ex.Message));
                 }
             }
         }
