@@ -268,34 +268,38 @@ namespace KilnFiringProfile
                     if (key.write_flag)
                     {
                         WriteKey = key.api_key;
+                        break;
                     }
                 }
 
-                public static async Task<TResult> PostFormUrlEncoded<TResult> (string url, IEnumerable<KeyValuePair<string, string>> postData)
+ 
+                try
                 {
+                    var kvp = new List<KeyValuePair<string, string>> ();
+                    kvp.Add (new KeyValuePair<string, string> ("api_key", UserID));
+                    kvp.Add (new KeyValuePair<string, string> ("description", dvgChannel[e.RowIndex]  Channels.channels[e.RowIndex].description));
+
                     using (var httpClient = new HttpClient ())
                     {
-                        using (var content = new FormUrlEncodedContent (postData))
+                        using (var content = new FormUrlEncodedContent (kvp))
                         {
                             content.Headers.Clear ();
                             content.Headers.Add ("Content-Type", "application/x-www-form-urlencoded");
 
-                            HttpResponseMessage response = await httpClient.PostAsync (url, content);
+                            string url = string.Format ("https://api.thingspeak.com/channels/{0}.json", Channels.channels[e.RowIndex].id);
+                            HttpResponseMessage response = await httpClient.PutAsync (url, content);
+                            if (!response.IsSuccessStatusCode)
+                            {
+                                MessageBox.Show (response.ReasonPhrase);
+                                return;
+                            }
 
-                            return await response.Content.ReadAsAsync<TResult> ();
+                            var httpResponse = await response.Content.ReadAsStringAsync ();
+                            if (httpResponse != null)
+                            {
+                                MessageBox.Show (httpResponse);
+                            }
                         }
-                    }
-                }
-                try
-                {
-                    var stringPayload = JsonConvert.SerializeObject (Channels.channels[e.RowIndex]);
-                    var httpContent = new StringContent (stringPayload, Encoding.UTF8, "application/json");
-                    HttpClient http = new HttpClient ();
-
-                    var httpResponse = await http.PutAsync (string.Format ("https://api.thingspeak.com/channels/{0}.json?api_key={1}", Channels.channels[e.RowIndex].id, WriteKey), httpContent);
-                    if (httpResponse != null)
-                    {
-                        MessageBox.Show (httpResponse.Content.ToString ());
                     }
                 }
                 catch (Exception ex)
