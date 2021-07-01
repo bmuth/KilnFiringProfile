@@ -75,4 +75,14 @@ namespace CreateChannel
         public Channel channel { get; set; }
         public List<Feed> feeds { get; set; }
     }
-}
+
+    public class FileKilnData
+    {
+        public FileKilnData (ChannelDef c, List<Feed> f)
+        {
+            channel = c;
+            feeds = f;
+        }
+        public ChannelDef channel {get; set;}
+        public List<Feed> feeds { get; set; }
+    }

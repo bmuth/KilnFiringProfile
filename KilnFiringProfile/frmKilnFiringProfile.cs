@@ -1,21 +1,16 @@
-﻿using System;
+﻿using CreateChannel;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.Remoting;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Xml.Serialization;
-using CreateChannel;
-using Newtonsoft.Json;
 
 
 namespace KilnFiringProfile
@@ -23,7 +18,7 @@ namespace KilnFiringProfile
 
     public partial class frmKilnFiringProfile : Form
     {
-        private string UserID = "7ZOLSL6SNVAUZLMB";
+        private readonly string UserID = "7ZOLSL6SNVAUZLMB";
         private System.Collections.Specialized.StringCollection ChannelColumnWidths;
         private bool bSettingWidthsToBeSaved = false;
         private RootChannel Channels;
@@ -66,12 +61,14 @@ namespace KilnFiringProfile
             KilnData.RemoveRange (0, 180);
             KilnData.RemoveAt (KilnData.Count - 1);
 
-            //tbTitle.Text = "Firing " + KilnData[0].created_at.ToLongDateString ();
-            //TempChart.Titles.Add (tbTitle.Text);
+            DisplayKilnData ();
+        }
 
+        private void DisplayKilnData ()
+        {
             TempChart.Series["Temperature"].ChartType = SeriesChartType.Line;
 
-            foreach (var k in KilnData)
+            foreach (var k in KilnDataRoot)
             {
                 TempChart.Series["Temperature"].Points.AddXY (k.field2 / 3600.0, k.field1 * 9.0 / 5.0 + 32.0);
             }
@@ -81,7 +78,6 @@ namespace KilnFiringProfile
 
             Title title = new Title (channel.description, Docking.Top, new Font ("Century Gothic", 20, FontStyle.Bold), Color.DarkSlateBlue);
             TempChart.Titles.Add (title);
-
         }
 
         /************************************************
@@ -337,6 +333,48 @@ namespace KilnFiringProfile
         private void frmKilnFiringProfile_SizeChanged (object sender, EventArgs e)
         {
             Debug.Print (this.Size.ToString ());
+        }
+
+        /***************************************************************
+         * 
+         * Open JSON file
+         * 
+         * ************************************************************/
+
+        private void openToolStripMenuItem_Click (object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog ())
+            {
+                //openFileDialog.InitialDirectory = "c:\\";
+                openFileDialog.Filter = "JSON files|*.json|XML files|*.xml";
+                openFileDialog.FilterIndex = 2;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog () == DialogResult.OK)
+                {
+                    switch (openFileDialog.FilterIndex)
+                    {
+                        case 1:
+                            //Read the contents of the file into a stream
+                            var fileStream = openFileDialog.OpenFile ();
+
+                            using (StreamReader reader = new StreamReader (fileStream))
+                            {
+                                string fileContent = reader.ReadToEnd ();
+                                KilnDataRoot = JsonConvert.DeserializeObject<Root> (fileContent);
+                            }
+                            break;
+                        case 2:
+                            XmlSerializer ser = new XmlSerializer (typeof (Root));
+
+                            using (StreamReader sr = new StreamReader (openFileDialog.FileName))
+                            {
+                                KilnDataRoot = (Root) ser.Deserialize (sr);
+                            }
+                            break;
+                    }
+                }
+            }
         }
     }
 }
