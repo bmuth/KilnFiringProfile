@@ -21,8 +21,9 @@ namespace KilnFiringProfile
         private readonly string UserID = "7ZOLSL6SNVAUZLMB";
         private System.Collections.Specialized.StringCollection ChannelColumnWidths;
         private bool bSettingWidthsToBeSaved = false;
-        private RootChannel Channels;
-        private Root KilnDataRoot;
+        private ThingSpeakChannels tsChannels;
+        private ThingSpeakData tsKilnData;
+        private LocalKilnData lKilnData;
         private bool bEnableDescription = false;
 
         public frmKilnFiringProfile ()
@@ -34,41 +35,55 @@ namespace KilnFiringProfile
 
         /**********************************************************************
          * 
-         * Fetch - fetch the data and display as a chart
+         * FetchThingSpeakData - fetch the data and display as a chart
          * 
          * *******************************************************************/
 
-        private async void Fetch (ChannelDef channel, string ReadKey)
+        private async void FetchThingSpeakData (ChannelDef channel, string ReadKey)
         {
             string http = string.Format ("https://api.thingspeak.com/channels/{0}/feeds.json?api_key={1}&results=1000", channel.id.ToString (), ReadKey);
             var content = await client.GetStringAsync (http);
-            KilnDataRoot = JsonConvert.DeserializeObject<Root> (content);
-            int CountReturned = KilnDataRoot.feeds.Count;
+            tsKilnData = JsonConvert.DeserializeObject<ThingSpeakData> (content);
+            int CountReturned = tsKilnData.feeds.Count;
 
-            List<Feed> KilnData = KilnDataRoot.feeds;
+            List<Feed> KilnData = tsKilnData.feeds;
 
             while (CountReturned >= 1000)
             {
                 http = string.Format ("https://api.thingspeak.com/channels/{0}/feeds.json?api_key={1}&results=1000&end={2}", channel.id.ToString (), ReadKey, KilnData[0].created_at);
                 content = await client.GetStringAsync (http);
-                KilnDataRoot = JsonConvert.DeserializeObject<Root> (content);
-                CountReturned = KilnDataRoot.feeds.Count;
-                KilnDataRoot.feeds.AddRange (KilnData);
-                KilnData = KilnDataRoot.feeds;
+                tsKilnData = JsonConvert.DeserializeObject<ThingSpeakData> (content);
+                CountReturned = tsKilnData.feeds.Count;
+                tsKilnData.feeds.AddRange (KilnData);
+                KilnData = tsKilnData.feeds;
             }
 
             KilnData = KilnData.Distinct ().ToList ();
-            KilnData.RemoveRange (0, 180);
-            KilnData.RemoveAt (KilnData.Count - 1);
+            if (channel.id == 1410216)
+            {
+                KilnData.RemoveRange (0, 180);
+                KilnData.RemoveAt (KilnData.Count - 1);
+            }
 
+            lKilnData = new LocalKilnData (channel, KilnData);
             DisplayKilnData ();
         }
 
         private void DisplayKilnData ()
         {
+
+            if (lKilnData == null || lKilnData.channel == null)
+
+            {
+                MessageBox.Show ("Either the KilnData channel info is null or there is no kiln data at all.");
+                return;
+            }
+            TempChart.Series.Clear ();
+            TempChart.Series.Add (new Series ("Temperature"));
             TempChart.Series["Temperature"].ChartType = SeriesChartType.Line;
 
-            foreach (var k in KilnDataRoot)
+            TempChart.Titles.Clear ();
+            foreach (var k in lKilnData.feeds)
             {
                 TempChart.Series["Temperature"].Points.AddXY (k.field2 / 3600.0, k.field1 * 9.0 / 5.0 + 32.0);
             }
@@ -76,8 +91,9 @@ namespace KilnFiringProfile
             TempChart.ChartAreas[0].AxisY.Title = "Temperature (Farenheit)";
             TempChart.ChartAreas[0].AxisX.Title = "Hours";
 
-            Title title = new Title (channel.description, Docking.Top, new Font ("Century Gothic", 20, FontStyle.Bold), Color.DarkSlateBlue);
+            Title title = new Title (lKilnData.channel.description, Docking.Top, new Font ("Century Gothic", 20, FontStyle.Bold), Color.DarkSlateBlue);
             TempChart.Titles.Add (title);
+            TempChart.ChartAreas[0].AxisX.RoundAxisValues ();
         }
 
         /************************************************
@@ -114,9 +130,9 @@ namespace KilnFiringProfile
             {
                 string http = string.Format ("https://api.thingspeak.com/users/brianmuth/channels.json?api_key={0}", UserID);
                 var content = await client.GetStringAsync (http);
-                Channels = JsonConvert.DeserializeObject<RootChannel> (content);
+                tsChannels = JsonConvert.DeserializeObject<ThingSpeakChannels> (content);
                 dgvChannel.AutoGenerateColumns = false;
-                dgvChannel.DataSource = Channels.channels;
+                dgvChannel.DataSource = tsChannels.channels;
             }
             catch (Exception ex)
             {
@@ -183,14 +199,14 @@ namespace KilnFiringProfile
 
                 string ReadKey = string.Empty;
 
-                foreach (var key in Channels.channels[e.RowIndex].api_keys)
+                foreach (var key in tsChannels.channels[e.RowIndex].api_keys)
                 {
                     if (key.write_flag == false)
                     {
                         ReadKey = key.api_key;
                     }
                 }
-                Fetch (Channels.channels[e.RowIndex], ReadKey);
+                FetchThingSpeakData (tsChannels.channels[e.RowIndex], ReadKey);
                 return;
             }
          }
@@ -228,17 +244,17 @@ namespace KilnFiringProfile
                             {
                                 JsonSerializer serializer = new JsonSerializer ();
                                 //serialize object directly into file stream
-                                serializer.Serialize (writer, KilnDataRoot);
+                                serializer.Serialize (writer, lKilnData);
                             }
                         }
                         break;
 
                     case 2:
-                        XmlSerializer xs = new XmlSerializer (typeof (Root));
+                        XmlSerializer xs = new XmlSerializer (typeof (ThingSpeakData));
 
                         using (StreamWriter sw = new StreamWriter (saveFileDialog1.OpenFile ()))
                         {
-                            xs.Serialize (sw, KilnDataRoot);
+                            xs.Serialize (sw, lKilnData);
                         }
                         break;
                 }
@@ -252,12 +268,12 @@ namespace KilnFiringProfile
                 await SaveDescription (e.RowIndex); 
                 bEnableDescription = false;
             }
-            Debug.Print (string.Format ("CellValueChanged"));// {0}, {1}", dgvChannel[3, 0].Value.ToString (), Channels.channels[e.RowIndex].description));
+            Debug.Print (string.Format ("CellValueChanged"));// {0}, {1}", dgvChannel[3, 0].Value.ToString (), tsChannels.channels[e.RowIndex].description));
         }
 
         private void dgvChannel_CellLeave (object sender, DataGridViewCellEventArgs e)
         {
-            Debug.Print (string.Format ("CellLeave {0}, {1}", dgvChannel[3, 0].Value.ToString (), Channels.channels[e.RowIndex].description));
+            Debug.Print (string.Format ("CellLeave {0}, {1}", dgvChannel[3, 0].Value.ToString (), tsChannels.channels[e.RowIndex].description));
 
             bEnableDescription = true;
         }
@@ -269,7 +285,7 @@ namespace KilnFiringProfile
 
             string WriteKey = string.Empty;
 
-            foreach (var key in Channels.channels[row].api_keys)
+            foreach (var key in tsChannels.channels[row].api_keys)
             {
                 if (key.write_flag)
                 {
@@ -291,7 +307,7 @@ namespace KilnFiringProfile
                         content.Headers.Clear ();
                         content.Headers.Add ("Content-Type", "application/x-www-form-urlencoded");
 
-                        string url = string.Format ("https://api.thingspeak.com/channels/{0}.json", Channels.channels[row].id);
+                        string url = string.Format ("https://api.thingspeak.com/channels/{0}.json", tsChannels.channels[row].id);
                         HttpResponseMessage response = await httpClient.PutAsync (url, content);
                         if (!response.IsSuccessStatusCode)
                         {
@@ -321,7 +337,7 @@ namespace KilnFiringProfile
 
         private void btnPrint_Click (object sender, EventArgs e)
         {
-            TempChart.Printing.PageSetup ();
+            TempChart.Printing.Print (true);
         }
 
         /****************************************************************
@@ -347,7 +363,7 @@ namespace KilnFiringProfile
             {
                 //openFileDialog.InitialDirectory = "c:\\";
                 openFileDialog.Filter = "JSON files|*.json|XML files|*.xml";
-                openFileDialog.FilterIndex = 2;
+                openFileDialog.FilterIndex = 1;
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog () == DialogResult.OK)
@@ -361,20 +377,50 @@ namespace KilnFiringProfile
                             using (StreamReader reader = new StreamReader (fileStream))
                             {
                                 string fileContent = reader.ReadToEnd ();
-                                KilnDataRoot = JsonConvert.DeserializeObject<Root> (fileContent);
+                                lKilnData = JsonConvert.DeserializeObject<LocalKilnData> (fileContent);
+                                if (lKilnData == null || (lKilnData.feeds == null))
+                                {
+                                    MessageBox.Show (string.Format ("Failed to deserialize {0}", openFileDialog.FileName));
+                                    return;
+                                }
                             }
                             break;
                         case 2:
-                            XmlSerializer ser = new XmlSerializer (typeof (Root));
+                            XmlSerializer ser = new XmlSerializer (typeof (ThingSpeakData));
 
                             using (StreamReader sr = new StreamReader (openFileDialog.FileName))
                             {
-                                KilnDataRoot = (Root) ser.Deserialize (sr);
+                                lKilnData = (LocalKilnData) ser.Deserialize (sr);
                             }
                             break;
                     }
+                    DisplayKilnData ();
                 }
             }
+        }
+
+        /*************************************************************
+          * 
+          * Print Setup
+          * 
+          * **********************************************************/
+
+
+        private void printSetupToolStripMenuItem_Click (object sender, EventArgs e)
+        {
+            TempChart.Printing.PageSetup ();
+
+        }
+
+        /*************************************************************
+          * 
+          * Print Preview 
+          * 
+          * **********************************************************/
+
+        private void printPreviewToolStripMenuItem_Click (object sender, EventArgs e)
+        {
+            TempChart.Printing.PrintPreview ();
         }
     }
 }

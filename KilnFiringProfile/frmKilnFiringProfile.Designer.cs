@@ -28,25 +28,25 @@
         /// </summary>
         private void InitializeComponent ()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.TempChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.btnPrint = new System.Windows.Forms.Button();
             this.dgvChannel = new System.Windows.Forms.DataGridView();
             this.Channel_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ChannelName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.CreationDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Description = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.btnSaveAs = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.printSetupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printPreviewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.TempChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvChannel)).BeginInit();
             this.menuStrip1.SuspendLayout();
@@ -54,26 +54,18 @@
             // 
             // TempChart
             // 
-            chartArea2.Name = "ChartArea1";
-            this.TempChart.ChartAreas.Add(chartArea2);
-            this.TempChart.Location = new System.Drawing.Point(111, 232);
+            chartArea1.Name = "ChartArea1";
+            this.TempChart.ChartAreas.Add(chartArea1);
+            this.TempChart.Location = new System.Drawing.Point(74, 151);
+            this.TempChart.Margin = new System.Windows.Forms.Padding(2);
             this.TempChart.Name = "TempChart";
-            series2.ChartArea = "ChartArea1";
-            series2.Name = "Temperature";
-            this.TempChart.Series.Add(series2);
-            this.TempChart.Size = new System.Drawing.Size(1371, 700);
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Name = "Temperature";
+            this.TempChart.Series.Add(series1);
+            this.TempChart.Size = new System.Drawing.Size(914, 455);
             this.TempChart.TabIndex = 0;
             this.TempChart.Text = "chart1";
-            // 
-            // btnPrint
-            // 
-            this.btnPrint.Location = new System.Drawing.Point(680, 968);
-            this.btnPrint.Name = "btnPrint";
-            this.btnPrint.Size = new System.Drawing.Size(75, 32);
-            this.btnPrint.TabIndex = 3;
-            this.btnPrint.Text = "Print";
-            this.btnPrint.UseVisualStyleBackColor = true;
-            this.btnPrint.Click += new System.EventHandler(this.btnPrint_Click);
             // 
             // dgvChannel
             // 
@@ -85,12 +77,11 @@
             this.ChannelName,
             this.CreationDate,
             this.Description});
-            this.dgvChannel.Location = new System.Drawing.Point(195, 42);
-            this.dgvChannel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.dgvChannel.Location = new System.Drawing.Point(130, 27);
             this.dgvChannel.Name = "dgvChannel";
             this.dgvChannel.RowHeadersWidth = 62;
             this.dgvChannel.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvChannel.Size = new System.Drawing.Size(1142, 172);
+            this.dgvChannel.Size = new System.Drawing.Size(761, 112);
             this.dgvChannel.TabIndex = 4;
             this.dgvChannel.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChannel_CellDoubleClick);
             this.dgvChannel.CellLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvChannel_CellLeave);
@@ -132,17 +123,6 @@
             this.Description.Name = "Description";
             this.Description.Width = 150;
             // 
-            // btnSaveAs
-            // 
-            this.btnSaveAs.Location = new System.Drawing.Point(820, 968);
-            this.btnSaveAs.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.btnSaveAs.Name = "btnSaveAs";
-            this.btnSaveAs.Size = new System.Drawing.Size(112, 35);
-            this.btnSaveAs.TabIndex = 5;
-            this.btnSaveAs.Text = "Save As...";
-            this.btnSaveAs.UseVisualStyleBackColor = true;
-            this.btnSaveAs.Click += new System.EventHandler(this.btnSaveAs_Click);
-            // 
             // menuStrip1
             // 
             this.menuStrip1.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
@@ -151,7 +131,8 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1778, 36);
+            this.menuStrip1.Padding = new System.Windows.Forms.Padding(4, 1, 0, 1);
+            this.menuStrip1.Size = new System.Drawing.Size(1185, 31);
             this.menuStrip1.TabIndex = 6;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -159,6 +140,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
             this.toolStripSeparator1,
             this.printSetupToolStripMenuItem,
             this.printPreviewToolStripMenuItem,
@@ -166,7 +149,7 @@
             this.toolStripSeparator2,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(54, 32);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(54, 29);
             this.fileToolStripMenuItem.Text = "&File";
             // 
             // openToolStripMenuItem
@@ -176,28 +159,36 @@
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(267, 6);
+            // 
             // printSetupToolStripMenuItem
             // 
             this.printSetupToolStripMenuItem.Name = "printSetupToolStripMenuItem";
             this.printSetupToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.printSetupToolStripMenuItem.Text = "Print &Setup";
+            this.printSetupToolStripMenuItem.Text = "P&rint Setup";
+            this.printSetupToolStripMenuItem.Click += new System.EventHandler(this.printSetupToolStripMenuItem_Click);
             // 
             // printPreviewToolStripMenuItem
             // 
             this.printPreviewToolStripMenuItem.Name = "printPreviewToolStripMenuItem";
             this.printPreviewToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.printPreviewToolStripMenuItem.Text = "Print Pre&view";
+            this.printPreviewToolStripMenuItem.Click += new System.EventHandler(this.printPreviewToolStripMenuItem_Click);
             // 
             // printToolStripMenuItem
             // 
             this.printToolStripMenuItem.Name = "printToolStripMenuItem";
             this.printToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.printToolStripMenuItem.Text = "&Print";
+            this.printToolStripMenuItem.Click += new System.EventHandler(this.btnPrint_Click);
             // 
-            // toolStripSeparator1
+            // toolStripSeparator2
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(267, 6);
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(267, 6);
             // 
             // exitToolStripMenuItem
             // 
@@ -205,22 +196,29 @@
             this.exitToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.exitToolStripMenuItem.Text = "&Exit";
             // 
-            // toolStripSeparator2
+            // saveToolStripMenuItem
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(267, 6);
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.saveToolStripMenuItem.Text = "&Save";
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.saveAsToolStripMenuItem.Text = "Save &As...";
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.btnSaveAs_Click);
             // 
             // frmKilnFiringProfile
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1778, 1051);
-            this.Controls.Add(this.btnSaveAs);
+            this.ClientSize = new System.Drawing.Size(1185, 683);
             this.Controls.Add(this.dgvChannel);
-            this.Controls.Add(this.btnPrint);
             this.Controls.Add(this.TempChart);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "frmKilnFiringProfile";
             this.Text = "Kiln Firing Profile";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmKilnFiringProfile_FormClosing);
@@ -239,9 +237,7 @@
         #endregion
 
         private System.Windows.Forms.DataVisualization.Charting.Chart TempChart;
-        private System.Windows.Forms.Button btnPrint;
         private System.Windows.Forms.DataGridView dgvChannel;
-        private System.Windows.Forms.Button btnSaveAs;
         private System.Windows.Forms.DataGridViewTextBoxColumn Channel_ID;
         private System.Windows.Forms.DataGridViewTextBoxColumn ChannelName;
         private System.Windows.Forms.DataGridViewTextBoxColumn CreationDate;
@@ -255,6 +251,8 @@
         private System.Windows.Forms.ToolStripMenuItem printToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
     }
 }
 

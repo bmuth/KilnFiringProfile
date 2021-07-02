@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CreateChannel
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+    // ThingSpeakData myDeserializedClass = JsonConvert.DeserializeObject<ThingSpeakData>(myJsonResponse); 
     public class ApiKey
     {
         public string api_key { get; set; }
@@ -33,13 +33,13 @@ namespace CreateChannel
         public List<ApiKey> api_keys { get; set; }
     }
 
-    public class RootChannel
+    public class ThingSpeakChannels
     {
         public List<ChannelDef> channels { get; set; }
     }
 
 
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse); 
+    // ThingSpeakData myDeserializedClass = JsonConvert.DeserializeObject<ThingSpeakData>(myJsonResponse); 
     public class Channel
     {
         public int id { get; set; }
@@ -70,19 +70,20 @@ namespace CreateChannel
         }
     }
 
-    public class Root
+    public class ThingSpeakData
     {
         public Channel channel { get; set; }
         public List<Feed> feeds { get; set; }
     }
 
-    public class FileKilnData
+    public class LocalKilnData
     {
-        public FileKilnData (ChannelDef c, List<Feed> f)
+        public LocalKilnData (ChannelDef c, List<Feed> f)
         {
             channel = c;
             feeds = f;
         }
-        public ChannelDef channel {get; set;}
+        public ChannelDef channel { get; set; }
         public List<Feed> feeds { get; set; }
     }
+}
