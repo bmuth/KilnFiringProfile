@@ -85,7 +85,14 @@ namespace KilnFiringProfile
             TempChart.Titles.Clear ();
             foreach (var k in lKilnData.feeds)
             {
-                TempChart.Series["Temperature"].Points.AddXY (k.field2 / 3600.0, k.field1 * 9.0 / 5.0 + 32.0);
+                if (lKilnData.channel.id == 1410216)
+                {
+                    TempChart.Series["Temperature"].Points.AddXY (k.field2 / 3600.0, k.field1 * 9.0 / 5.0 + 32.0);
+                }
+                else 
+                {
+                    TempChart.Series["Temperature"].Points.AddXY (k.field2 / 3600.0, k.field1);
+                }
             }
 
             TempChart.ChartAreas[0].AxisY.Title = "Temperature (Farenheit)";
