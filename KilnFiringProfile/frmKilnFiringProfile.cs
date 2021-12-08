@@ -305,7 +305,7 @@ namespace KilnFiringProfile
             {
                 var kvp = new List<KeyValuePair<string, string>> ();
                 kvp.Add (new KeyValuePair<string, string> ("api_key", UserID));
-                kvp.Add (new KeyValuePair<string, string> ("description", dgvChannel[3, 0].Value.ToString ()));
+                kvp.Add (new KeyValuePair<string, string> ("description", dgvChannel[3, row].Value.ToString ()));
 
                 using (var httpClient = new HttpClient ())
                 {
