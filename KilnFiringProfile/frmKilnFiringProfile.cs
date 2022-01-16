@@ -98,8 +98,11 @@ namespace KilnFiringProfile
             TempChart.ChartAreas[0].AxisY.Title = "Temperature (Farenheit)";
             TempChart.ChartAreas[0].AxisX.Title = "Hours";
 
-            Title title = new Title (lKilnData.channel.description, Docking.Top, new Font ("Century Gothic", 20, FontStyle.Bold), Color.DarkSlateBlue);
-            TempChart.Titles.Add (title);
+            if (lKilnData.channel.description != null)
+            { 
+                Title title = new Title (lKilnData.channel.description, Docking.Top, new Font ("Century Gothic", 20, FontStyle.Bold), Color.DarkSlateBlue);
+                TempChart.Titles.Add (title);
+            }
             TempChart.ChartAreas[0].AxisX.RoundAxisValues ();
         }
 
