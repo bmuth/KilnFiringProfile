@@ -73,6 +73,7 @@
             this.dgvFiring.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvFiring_CellValueChanged);
             this.dgvFiring.ColumnWidthChanged += new System.Windows.Forms.DataGridViewColumnEventHandler(this.dgvFiring_ColumnWidthChanged);
             this.dgvFiring.RowStateChanged += new System.Windows.Forms.DataGridViewRowStateChangedEventHandler(this.dgvFiring_RowStateChanged);
+            this.dgvFiring.UserDeletingRow += new System.Windows.Forms.DataGridViewRowCancelEventHandler(this.dgvFiring_UserDeletingRow);
             // 
             // id
             // 

@@ -224,7 +224,32 @@ namespace KilnFiringMD
         {
             if (e.StateChanged == DataGridViewElementStates.Selected)
             {
-                DisplayKilnData ((DateTime) e.Row.Cells[2].Value, (string) e.Row.Cells[3].Value, (int) e.Row.Cells[0].Value);
+                 DisplayKilnData ((DateTime) e.Row.Cells[2].Value, (string) e.Row.Cells[3].Value, (int) e.Row.Cells[0].Value);
+            }
+        }
+
+        private void dgvFiring_UserDeletingRow (object sender, DataGridViewRowCancelEventArgs e)
+        {
+            if (MessageBox.Show ("Confirm deleting " + e.Row.Cells[1].Value.ToString () + "?", 
+                "Confirm row deletion", 
+                MessageBoxButtons.OKCancel) != DialogResult.OK)
+            {
+                e.Cancel = true;
+            }
+            else
+            {
+                using (var con = new MySqlConnection (m_ConnectionString))
+                {
+                    con.Open ();
+                    MySqlCommand cmd = new MySqlCommand ();
+                    StringBuilder sb = new StringBuilder ("DELETE FROM FiringRun WHERE id  = ");
+                    sb.Append (e.Row.Cells[0].Value.ToString ());
+
+                    cmd.CommandText = sb.ToString ();
+                    cmd.Connection = con;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.ExecuteNonQuery ();
+                }
             }
         }
     }
