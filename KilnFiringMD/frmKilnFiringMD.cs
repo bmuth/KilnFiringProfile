@@ -242,7 +242,15 @@ namespace KilnFiringMD
                 {
                     con.Open ();
                     MySqlCommand cmd = new MySqlCommand ();
-                    StringBuilder sb = new StringBuilder ("DELETE FROM FiringRun WHERE id  = ");
+
+                    StringBuilder sb = new StringBuilder ("DELETE FROM DataPoint WHERE fid = ");
+                    sb.Append (e.Row.Cells[0].Value.ToString ());
+                    cmd.CommandText = sb.ToString ();
+                    cmd.Connection = con;
+                    cmd.CommandType = CommandType.Text;
+                    cmd.ExecuteNonQuery ();
+
+                    sb = new StringBuilder ("DELETE FROM FiringRun WHERE id  = ");
                     sb.Append (e.Row.Cells[0].Value.ToString ());
 
                     cmd.CommandText = sb.ToString ();
@@ -250,6 +258,17 @@ namespace KilnFiringMD
                     cmd.CommandType = CommandType.Text;
                     cmd.ExecuteNonQuery ();
                 }
+            }
+        }
+
+        private void TempChart_MouseClick (object sender, MouseEventArgs e)
+        {
+            var r = TempChart.HitTest (e.X, e.Y);
+            if (r.ChartElementType == ChartElementType.DataPoint)
+            {
+
+                DataPoint p = (DataPoint) r.Object;
+                Debug.Print (string.Format ("{0} {1}", p.XValue, p.YValues[0]));
             }
         }
     }
