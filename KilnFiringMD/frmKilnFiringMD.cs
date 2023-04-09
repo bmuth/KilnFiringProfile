@@ -179,7 +179,18 @@ namespace KilnFiringMD
                 con.Open ();
                 MySqlCommand cmd = new MySqlCommand ();
                 StringBuilder sb = new StringBuilder ("UPDATE FiringRun SET description = '");
-                sb.Append (dgvFiring.Rows[row].Cells[3].Value.ToString ());
+
+                StringBuilder sb1 = new StringBuilder ();
+                foreach (var c in dgvFiring.Rows[row].Cells[3].Value.ToString ())
+                {
+                    sb1.Append (c);
+                    if (c == '\'')
+                    {
+                        sb1.Append (c);
+                    }
+                }
+                
+                sb.Append (sb1.ToString ());
                 sb.Append ("' WHERE id=");
                 sb.Append (dgvFiring.Rows[row].Cells[0].Value.ToString ());
 
@@ -269,7 +280,52 @@ namespace KilnFiringMD
 
                 DataPoint p = (DataPoint) r.Object;
                 Debug.Print (string.Format ("{0} {1}", p.XValue, p.YValues[0]));
+
+                var pt = new PointF ((float) TempChart.Series[0].Points[r.PointIndex].XValue, (float) TempChart.Series[0].Points[r.PointIndex].YValues[0]);
+                CalloutAnnotation ca = new CalloutAnnotation ();
+                ca.AnchorDataPoint = TempChart.Series[0].Points[r.PointIndex];
+                ca.Text = pt.ToString ();
+                ca.CalloutStyle = CalloutStyle.SimpleLine;
+                ca.ForeColor = Color.Red;
+                ca.Font = new Font ("Tahoma", 12, FontStyle.Bold);
+                TempChart.Annotations[0] = ca;
+                TempChart.Invalidate ();
             }
+        }
+
+        private void TempChart_MouseMove (object sender, MouseEventArgs e)
+        {
+            var r = TempChart.HitTest (e.X, e.Y);
+            if (r.ChartElementType == ChartElementType.DataPoint)
+            {
+
+                DataPoint p = (DataPoint) r.Object;
+
+                var pt = new PointF ((float) TempChart.Series[0].Points[r.PointIndex].XValue, (float) TempChart.Series[0].Points[r.PointIndex].YValues[0]);
+                CalloutAnnotation ca = new CalloutAnnotation ();
+                ca.AnchorDataPoint = TempChart.Series[0].Points[r.PointIndex];
+                StringBuilder sb = new StringBuilder (pt.X.ToString ("0.00"));
+                sb.Append (" hrs, ");
+                sb.Append (pt.Y.ToString ("0.0 "));
+                sb.Append ("°F");
+                ca.Text = sb.ToString ();
+                ca.CalloutStyle = CalloutStyle.SimpleLine;
+                ca.ForeColor = Color.DarkSlateBlue;
+                ca.Font = new Font ("Tahoma", 12, FontStyle.Bold);
+                TempChart.Annotations[0] = ca;
+                TempChart.Invalidate ();
+            }
+        }
+
+        private void frmKilnFiringMD_Load (object sender, EventArgs e)
+        {
+            TempChart.Annotations.Add (new CalloutAnnotation());
+        }
+
+        private void TempChart_MouseLeave (object sender, EventArgs e)
+        {
+            TempChart.Annotations[0] = new CalloutAnnotation ();
+            TempChart.Invalidate ();
         }
     }
 }

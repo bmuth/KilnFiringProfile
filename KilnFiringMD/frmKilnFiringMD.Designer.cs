@@ -58,6 +58,8 @@
             this.TempChart.TabIndex = 0;
             this.TempChart.Text = "TempChart";
             this.TempChart.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TempChart_MouseClick);
+            this.TempChart.MouseLeave += new System.EventHandler(this.TempChart_MouseLeave);
+            this.TempChart.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TempChart_MouseMove);
             // 
             // dgvFiring
             // 
@@ -110,6 +112,7 @@
             this.Name = "frmKilnFiringMD";
             this.Text = "Kiln Firing Run (MariaDB)";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmKilnFiringMD_FormClosing);
+            this.Load += new System.EventHandler(this.frmKilnFiringMD_Load);
             this.Shown += new System.EventHandler(this.frmKilnFiringMD_Shown);
             ((System.ComponentModel.ISupportInitialize)(this.TempChart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvFiring)).EndInit();
